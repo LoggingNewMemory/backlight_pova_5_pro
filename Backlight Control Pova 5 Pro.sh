@@ -8,6 +8,7 @@
 
 # Enable LED function (set max current)
 enable_led() {
+    su -c 'echo 1 > /sys/class/leds/aw22xxx_led/hwen'
     su -c 'echo c > /sys/class/leds/aw22xxx_led/imax'
     su -c 'echo 255 > /sys/class/leds/aw22xxx_led/brightness' 
 }
