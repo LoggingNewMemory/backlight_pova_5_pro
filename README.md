@@ -1,5 +1,4 @@
-# Templates
-Templates
+# Backlight Controller For TECNO POVA 5 Pro
 
 Support Me: <br />
 https://saweria.co/kanagawayamada (ID / PH) <br />
