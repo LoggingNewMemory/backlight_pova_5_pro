@@ -6,9 +6,7 @@ DEFAULT_RGB="0000000000000000"
 
 # Enable LED function
 enable_led() {
-    su -c 'echo 1 > /sys/class/leds/aw22xxx_led/hwen'
-    su -c "echo $MAX_BRIGHTNESS > /sys/class/leds/aw22xxx_led/brightness"
-    su -c "echo $DEFAULT_RGB > /sys/class/leds/aw22xxx_led/rgb"
+    su -c "echo c > /sys/class/leds/aw22xxx_led/imax"
 }
 
 # Main menu
