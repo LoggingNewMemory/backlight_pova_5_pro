@@ -2,6 +2,7 @@
 
 # System constants
 DEFAULT_RGB="0000000000000000"
+MAX_BRIGHTNESS=255
 
 # Enable LED function
 enable_led() {
