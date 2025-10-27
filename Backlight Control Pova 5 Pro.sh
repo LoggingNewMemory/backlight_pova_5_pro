@@ -86,12 +86,11 @@ custom_settings_menu() {
     clear
     echo "=== Custom Settings ==="
     echo ""
-    echo "1. Set Brightness"
-    echo "2. Set RGB"
-    echo "3. Set Current (IMAX)"
-    echo "4. Back"
+    echo "1. Set RGB"
+    echo "2. Set Current (IMAX)"
+    echo "3. Back"
     echo ""
-    echo -ne "Select option [1-4]: "
+    echo -ne "Select option [1-3]: "
 }
 
 # System information
@@ -277,20 +276,13 @@ while true; do
                 
                 case $custom_choice in
                     1)
-                        echo -ne "Enter brightness (0-$MAX_BRIGHTNESS): "
-                        read brightness
-                        su -c "echo $brightness > /sys/class/leds/aw22xxx_led/brightness"
-                        echo "Brightness set to $brightness"
-                        sleep 1
-                        ;;
-                    2)
                         echo -ne "Enter 16-digit HEX RGB value: "
                         read rgb
                         su -c "echo $rgb > /sys/class/leds/aw22xxx_led/rgb"
                         echo "RGB values updated"
                         sleep 1
                         ;;
-                    3)
+                    2)
                         echo "Available current levels:"
                         su -c 'cat /sys/class/leds/aw22xxx_led/imax | grep AW22XXX_IMAX'
                         echo -ne "Enter level number (0-b): "
@@ -299,7 +291,7 @@ while true; do
                         echo "Current level set"
                         sleep 1
                         ;;
-                    4)
+                    3)
                         break
                         ;;
                     *)
