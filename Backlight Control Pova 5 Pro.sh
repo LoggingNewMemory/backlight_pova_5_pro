@@ -1,9 +1,3 @@
-#!/system/bin/sh
-
-# System constants
-MAX_BRIGHTNESS=255
-DEFAULT_RGB="0000000000000000"
-
 # Enable LED function
 enable_led() {
     su -c "echo c > /sys/class/leds/aw22xxx_led/imax"
