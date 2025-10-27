@@ -17,11 +17,9 @@ show_menu() {
     echo "===     POVA 5 Pro    ==="
     echo "=== Backlight Control ==="
     echo ""
-    echo "1. Basic Effects"
-    echo "2. Static Colors"
-    echo "3. Audio Effects"
-    echo "4. Game Modes"
-    echo "5. Custom Settings"
+    echo "1. Dynamic Effects"
+    echo "2. Music Effects"
+    echo "3. Custom Settings"
     echo "0. Turn Off LEDs"
     echo ""
     echo "S. System Info"
@@ -29,56 +27,31 @@ show_menu() {
     echo ""
 }
 
-# Basic effects menu
-basic_effects_menu() {
+# Dynamic effects menu
+dynamic_effects_menu() {
     clear
-    echo "=== Basic Effects ==="
+    echo "=== Dynamic Effects ==="
     echo ""
-    echo "1. Breathing"
-    echo "2. Collision"
-    echo "3. Skyline"
-    echo "4. Flower"
-    echo "5. Back"
-    echo ""
-    echo -ne "Select option [1-5]: "
-}
-
-# Static colors menu
-static_colors_menu() {
-    clear
-    echo "=== Static Colors ==="
-    echo ""
-    echo "1. Red"
-    echo "2. Green"
-    echo "3. Blue"
-    echo "4. Yellow"
-    echo "5. Custom RGB"
+    echo "1. Breathing (Pure Mode)"
+    echo "2. Breathing (Party Mode)"
+    echo "3. Collision (Double Flash)"
+    echo "4. Skyline (Incoming)"
+    echo "5. Flash"
     echo "6. Back"
     echo ""
     echo -ne "Select option [1-6]: "
 }
 
 # Audio effects menu
-audio_effects_menu() {
+music_effects_menu() {
     clear
-    echo "=== Audio Effects ==="
+    echo "=== Music Effects ==="
     echo ""
-    echo "1. Audio Skyline"
-    echo "2. Audio Flower"
+    echo "1. Music (Pure Mode)"
+    echo "2. Music (Party Mode)"
     echo "3. Back"
     echo ""
     echo -ne "Select option [1-3]: "
-}
-
-# Game modes menu
-game_modes_menu() {
-    clear
-    echo "=== Game Modes ==="
-    echo ""
-    echo "1. Game Mode"
-    echo "2. Back"
-    echo ""
-    echo -ne "Select option [1-2]: "
 }
 
 # Custom settings menu
@@ -86,7 +59,7 @@ custom_settings_menu() {
     clear
     echo "=== Custom Settings ==="
     echo ""
-    echo "1. Set RGB"
+    echo "1. Set RGB (16-digit HEX)"
     echo "2. Set Current (IMAX)"
     echo "3. Back"
     echo ""
@@ -111,99 +84,55 @@ system_info() {
 # Main loop
 while true; do
     show_menu
-    echo -ne "Select option [0-5/S/Q]: "
+    echo -ne "Select option [0-3/S/Q]: "
     read main_choice
     
     case $main_choice in
         0)
+            su -c 'echo 9 > /sys/class/leds/aw22xxx_led/cfg'
             su -c 'echo 0 > /sys/class/leds/aw22xxx_led/hwen'
             echo "LEDs turned off"
             sleep 1
             ;;
         1)
             while true; do
-                basic_effects_menu
+                dynamic_effects_menu
                 read effect_choice
                 
                 case $effect_choice in
                     1)
                         enable_led
                         su -c 'echo 2 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Breathing effect activated"
+                        su -c 'echo 1c > /sys/class/leds/aw22xxx_led/cfg'
+                        echo "Breathing (Pure) activated"
                         sleep 1
                         ;;
                     2)
+                        enable_led
+                        su -c 'echo 2 > /sys/class/leds/aw22xxx_led/effect'
+                        su -c 'echo 1d > /sys/class/leds/aw22xxx_led/cfg'
+                        echo "Breathing (Party) activated"
+                        sleep 1
+                        ;;
+                    3)
                         enable_led
                         su -c 'echo 3 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Collision effect activated"
+                        su -c 'echo 3 > /sys/class/leds/aw22xxx_led/cfg'
+                        echo "Collision (Double Flash) activated"
                         sleep 1
                         ;;
-                    3)
+                    4)
                         enable_led
                         su -c 'echo 4 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Skyline effect activated"
+                        su -c 'echo 4 > /sys/class/leds/aw22xxx_led/cfg'
+                        echo "Skyline (Incoming) activated"
                         sleep 1
                         ;;
-                    4)
+                    5)
                         enable_led
                         su -c 'echo 5 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Flower effect activated"
-                        sleep 1
-                        ;;
-                    5)
-                        break
-                        ;;
-                    *)
-                        echo "Invalid choice!"
-                        sleep 1
-                        ;;
-                esac
-            done
-            ;;
-        2)
-            while true; do
-                static_colors_menu
-                read color_choice
-                
-                case $color_choice in
-                    1)
-                        enable_led
-                        su -c 'echo 8 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Red color activated"
-                        sleep 1
-                        ;;
-                    2)
-                        enable_led
-                        su -c 'echo 9 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Green color activated"
-                        sleep 1
-                        ;;
-                    3)
-                        enable_led
-                        su -c 'echo 10 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Blue color activated"
-                        sleep 1
-                        ;;
-                    4)
-                        enable_led
-                        # Fixed yellow color - using RGB combination instead of effect 11
-                        su -c 'echo "255 255 0" > /sys/class/leds/aw22xxx_led/task0'
-                        echo "Yellow color activated"
-                        sleep 1
-                        ;;
-                    5)
-                        echo -ne "Enter RGB values (R G B, 0-255): "
-                        read r g b
-                        enable_led
-                        su -c "echo \"$r $g $b\" > /sys/class/leds/aw22xxx_led/task0"
-                        echo "Custom RGB color set"
+                        su -c 'echo 2 > /sys/class/leds/aw22xxx_led/cfg'
+                        echo "Flash activated"
                         sleep 1
                         ;;
                     6)
@@ -216,24 +145,24 @@ while true; do
                 esac
             done
             ;;
-        3)
+        2)
             while true; do
-                audio_effects_menu
+                music_effects_menu
                 read audio_choice
                 
                 case $audio_choice in
                     1)
                         enable_led
                         su -c 'echo 6 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Audio skyline activated"
+                        su -c 'echo 12 > /sys/class/leds/aw22xxx_led/cfg'
+                        echo "Music (Pure Mode) activated"
                         sleep 1
                         ;;
                     2)
                         enable_led
                         su -c 'echo 7 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Audio flower activated"
+                        su -c 'echo 13 > /sys/class/leds/aw22xxx_led/cfg'
+                        echo "Music (Party Mode) activated"
                         sleep 1
                         ;;
                     3)
@@ -246,30 +175,7 @@ while true; do
                 esac
             done
             ;;
-        4)
-            while true; do
-                game_modes_menu
-                read game_choice
-                
-                case $game_choice in
-                    1)
-                        enable_led
-                        su -c 'echo 12 > /sys/class/leds/aw22xxx_led/effect'
-                        su -c 'echo 1 > /sys/class/leds/aw22xxx_led/cfg'
-                        echo "Game mode activated"
-                        sleep 1
-                        ;;
-                    2)
-                        break
-                        ;;
-                    *)
-                        echo "Invalid choice!"
-                        sleep 1
-                        ;;
-                esac
-            done
-            ;;
-        5)
+        3)
             while true; do
                 custom_settings_menu
                 read custom_choice
