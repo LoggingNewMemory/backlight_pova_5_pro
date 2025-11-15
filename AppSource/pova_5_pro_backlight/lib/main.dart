@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   late File _scriptFile;
   bool _isScriptReady = false;
   bool? _hasRoot;
-  String _debugOutput = "Initializing...";
+  String _debugOutput = "Initializing..."; // Kept for logic, but not displayed
 
   @override
   void initState() {
@@ -208,22 +208,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ..._buildContentWidgets(),
               const Spacer(),
-              if (_hasRoot != false)
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  height: 100,
-                  width: double.infinity,
-                  child: SingleChildScrollView(
-                    child: Text(
-                      _debugOutput,
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 10,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ),
-                ),
+              // Debug window removed
             ],
           ),
         ),
