@@ -154,19 +154,25 @@ class _HomePageState extends State<HomePage> {
       AppButton(
         label: 'FLOW',
         onPressed: () => _runScript('1'),
-        borderColor: const Color(0xFF6A1B9A),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6A1B9A), Color(0xFFD32F2F)],
+        ),
       ),
       const SizedBox(height: 24),
       AppButton(
         label: 'BREATHING',
         onPressed: () => _runScript('2'),
-        borderColor: const Color(0xFFD32F2F),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFD32F2F), Color(0xFF00ACC1)],
+        ),
       ),
       const SizedBox(height: 24),
       AppButton(
         label: 'TURN OFF LED',
         onPressed: () => _runScript('3'),
-        borderColor: const Color(0xFF00ACC1),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1976D2), Color(0xFF00ACC1)],
+        ),
       ),
     ];
   }
@@ -185,7 +191,6 @@ class _HomePageState extends State<HomePage> {
               if (_hasRoot != null) Image.asset('assets/Banner.png'),
               ..._buildContentWidgets(),
               const Spacer(),
-              // Only show debug box if root is NOT denied
               if (_hasRoot != false)
                 Container(
                   padding: const EdgeInsets.all(8.0),
@@ -213,35 +218,48 @@ class _HomePageState extends State<HomePage> {
 class AppButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
-  final Color borderColor;
+  final Gradient gradient;
 
   const AppButton({
     super.key,
     required this.label,
     required this.onPressed,
-    required this.borderColor,
+    required this.gradient,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
       height: 60,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.white,
-          side: BorderSide(color: borderColor, width: 2.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            margin: const EdgeInsets.all(2.5),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(9.5),
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
           ),
         ),
-        child: Text(label),
       ),
     );
   }
