@@ -188,7 +188,24 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (_hasRoot != null) Image.asset('assets/Banner.png'),
+              if (_hasRoot != null)
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Container(
+                    margin: const EdgeInsets.all(2.5),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(9.5),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(9.5),
+                      child: Image.asset('assets/Banner.png'),
+                    ),
+                  ),
+                ),
               ..._buildContentWidgets(),
               const Spacer(),
               if (_hasRoot != false)
