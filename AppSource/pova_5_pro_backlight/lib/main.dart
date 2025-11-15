@@ -31,6 +31,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late File _scriptFile;
   bool _isScriptReady = false;
+  bool? _hasRoot;
   String _debugOutput = "Initializing...";
 
   @override
@@ -41,6 +42,26 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _setupScript() async {
     try {
+      setState(() {
+        _debugOutput = 'Checking for root access...';
+      });
+
+      final rootCheck = await Process.run('su', ['-c', 'id']);
+
+      if (rootCheck.exitCode != 0) {
+        setState(() {
+          _hasRoot = false;
+          _debugOutput =
+              'Root access denied. Please grant root permissions.\n\n${rootCheck.stderr}';
+        });
+        return;
+      }
+
+      setState(() {
+        _hasRoot = true;
+        _debugOutput = 'Root access granted. Setting up script...';
+      });
+
       final dir = await getApplicationDocumentsDirectory();
       _scriptFile = File('${dir.path}/Backlight.sh');
 
@@ -48,7 +69,10 @@ class _HomePageState extends State<HomePage> {
       final bytes = data.buffer.asUint8List();
       await _scriptFile.writeAsBytes(bytes, flush: true);
 
-      final chmodResult = await Process.run('chmod', ['+x', _scriptFile.path]);
+      final chmodResult = await Process.run('su', [
+        '-c',
+        'chmod +x ${_scriptFile.path}',
+      ]);
 
       if (chmodResult.exitCode != 0) {
         throw Exception(
@@ -62,25 +86,30 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       setState(() {
+        _hasRoot = false;
         _debugOutput = 'Error setting up script:\n$e';
       });
     }
   }
 
   Future<void> _runScript(String arg) async {
-    if (!_isScriptReady) {
+    if (!_isScriptReady || _hasRoot != true) {
       setState(() {
-        _debugOutput = 'Script is not ready. Please restart the app.';
+        _debugOutput =
+            'Script is not ready or root is not granted. Please restart the app.';
       });
       return;
     }
 
     try {
-      final result = await Process.run('sh', [_scriptFile.path, arg]);
+      final result = await Process.run('su', [
+        '-c',
+        'sh "${_scriptFile.path}" "$arg"',
+      ]);
 
       setState(() {
         if (result.stdout.toString().isEmpty &&
-            result.stderr.toString().isEmpty) {
+            result.stdout.toString().isEmpty) {
           _debugOutput = 'Script executed with arg $arg (No output).';
         } else {
           _debugOutput =
@@ -94,6 +123,54 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  List<Widget> _buildContentWidgets() {
+    if (_hasRoot == null) {
+      return [
+        const Expanded(child: Center(child: CircularProgressIndicator())),
+      ];
+    }
+
+    if (_hasRoot == false) {
+      return [
+        const SizedBox(height: 50),
+        Expanded(
+          child: Center(
+            child: Text(
+              'Please Grant Root',
+              style: TextStyle(
+                color: Colors.red.shade400,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ];
+    }
+
+    return [
+      const SizedBox(height: 50),
+      AppButton(
+        label: 'FLOW',
+        onPressed: () => _runScript('1'),
+        borderColor: const Color(0xFF6A1B9A),
+      ),
+      const SizedBox(height: 24),
+      AppButton(
+        label: 'BREATHING',
+        onPressed: () => _runScript('2'),
+        borderColor: const Color(0xFFD32F2F),
+      ),
+      const SizedBox(height: 24),
+      AppButton(
+        label: 'TURN OFF LED',
+        onPressed: () => _runScript('3'),
+        borderColor: const Color(0xFF00ACC1),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,41 +182,26 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset('assets/Banner.png'),
-              const SizedBox(height: 50),
-              AppButton(
-                label: 'FLOW',
-                onPressed: () => _runScript('1'),
-                borderColor: const Color(0xFF6A1B9A),
-              ),
-              const SizedBox(height: 24),
-              AppButton(
-                label: 'BREATHING',
-                onPressed: () => _runScript('2'),
-                borderColor: const Color(0xFFD32F2F),
-              ),
-              const SizedBox(height: 24),
-              AppButton(
-                label: 'TURN OFF LED',
-                onPressed: () => _runScript('3'),
-                borderColor: const Color(0xFF00ACC1),
-              ),
+              if (_hasRoot != null) Image.asset('assets/Banner.png'),
+              ..._buildContentWidgets(),
               const Spacer(),
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                height: 100,
-                width: double.infinity,
-                child: SingleChildScrollView(
-                  child: Text(
-                    _debugOutput,
-                    style: const TextStyle(
-                      color: Colors.white38,
-                      fontSize: 10,
-                      fontFamily: 'monospace',
+              // Only show debug box if root is NOT denied
+              if (_hasRoot != false)
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  height: 100,
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    child: Text(
+                      _debugOutput,
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                        fontFamily: 'monospace',
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
