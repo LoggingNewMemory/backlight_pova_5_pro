@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const BacklightApp());
@@ -32,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   late File _scriptFile;
   bool _isScriptReady = false;
   bool? _hasRoot;
-  String _debugOutput = "Initializing..."; // Kept for logic, but not displayed
+  String _debugOutput = "Initializing...";
 
   @override
   void initState() {
@@ -123,6 +125,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _launchDonateLink() async {
+    final Uri url = Uri.parse('https://t.me/KanagawaYamadaCH/2543');
+    try {
+      // Launches the URL in an external browser/app
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      // You could show an error message to the user here
+      debugPrint('Could not launch $url: $e');
+    }
+  }
+
   List<Widget> _buildContentWidgets() {
     if (_hasRoot == null) {
       return [
@@ -208,7 +221,51 @@ class _HomePageState extends State<HomePage> {
                 ),
               ..._buildContentWidgets(),
               const Spacer(),
-              // Debug window removed
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 16, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _launchDonateLink,
+                      icon: const Icon(
+                        FontAwesomeIcons.moneyBillWave,
+                        size: 16,
+                        color: Colors.white70,
+                      ),
+                      label: const Text(
+                        'Donate',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    const Row(
+                      children: [
+                        Icon(
+                          FontAwesomeIcons.infoCircle,
+                          size: 16,
+                          color: Colors.white70,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'Version: 1.0',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
