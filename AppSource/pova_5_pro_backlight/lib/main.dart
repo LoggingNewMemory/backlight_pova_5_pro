@@ -34,7 +34,6 @@ class _HomePageState extends State<HomePage> {
   late File _scriptFile;
   bool _isScriptReady = false;
   bool? _hasRoot;
-  String _debugOutput = "Initializing...";
 
   @override
   void initState() {
@@ -44,24 +43,17 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _setupScript() async {
     try {
-      setState(() {
-        _debugOutput = 'Checking for root access...';
-      });
-
       final rootCheck = await Process.run('su', ['-c', 'id']);
 
       if (rootCheck.exitCode != 0) {
         setState(() {
           _hasRoot = false;
-          _debugOutput =
-              'Root access denied. Please grant root permissions.\n\n${rootCheck.stderr}';
         });
         return;
       }
 
       setState(() {
         _hasRoot = true;
-        _debugOutput = 'Root access granted. Setting up script...';
       });
 
       final dir = await getApplicationDocumentsDirectory();
@@ -84,44 +76,23 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         _isScriptReady = true;
-        _debugOutput = 'Script ready. Press a button.';
       });
     } catch (e) {
       setState(() {
         _hasRoot = false;
-        _debugOutput = 'Error setting up script:\n$e';
       });
     }
   }
 
   Future<void> _runScript(String arg) async {
     if (!_isScriptReady || _hasRoot != true) {
-      setState(() {
-        _debugOutput =
-            'Script is not ready or root is not granted. Please restart the app.';
-      });
       return;
     }
 
     try {
-      final result = await Process.run('su', [
-        '-c',
-        'sh "${_scriptFile.path}" "$arg"',
-      ]);
-
-      setState(() {
-        if (result.stdout.toString().isEmpty &&
-            result.stdout.toString().isEmpty) {
-          _debugOutput = 'Script executed with arg $arg (No output).';
-        } else {
-          _debugOutput =
-              'STDOUT:\n${result.stdout}\n\nSTDERR:\n${result.stderr}';
-        }
-      });
+      await Process.run('su', ['-c', 'sh "${_scriptFile.path}" "$arg"']);
     } catch (e) {
-      setState(() {
-        _debugOutput = 'Error running script:\n$e';
-      });
+      // Errors are intentionally ignored
     }
   }
 
@@ -130,11 +101,10 @@ class _HomePageState extends State<HomePage> {
     try {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (e) {
-      debugPrint('Could not launch $url: $e');
+      // Errors are intentionally ignored
     }
   }
 
-  // --- ADDED THIS FUNCTION ---
   Future<void> _launchReleasesLink() async {
     final Uri url = Uri.parse(
       'https://github.com/LoggingNewMemory/backlight_pova_5_pro/releases',
@@ -142,7 +112,7 @@ class _HomePageState extends State<HomePage> {
     try {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (e) {
-      debugPrint('Could not launch $url: $e');
+      // Errors are intentionally ignored
     }
   }
 
@@ -256,7 +226,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    // --- MODIFIED THIS WIDGET ---
                     TextButton(
                       onPressed: _launchReleasesLink,
                       style: TextButton.styleFrom(
