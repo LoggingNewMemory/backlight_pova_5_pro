@@ -134,6 +134,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // --- ADDED THIS FUNCTION ---
+  Future<void> _launchReleasesLink() async {
+    final Uri url = Uri.parse(
+      'https://github.com/LoggingNewMemory/backlight_pova_5_pro/releases',
+    );
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch $url: $e');
+    }
+  }
+
   List<Widget> _buildContentWidgets() {
     if (_hasRoot == null) {
       return [
@@ -244,22 +256,31 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    const Row(
-                      children: [
-                        Icon(
-                          FontAwesomeIcons.infoCircle,
-                          size: 16,
-                          color: Colors.white70,
+                    // --- MODIFIED THIS WIDGET ---
+                    TextButton(
+                      onPressed: _launchReleasesLink,
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Version: 1.0',
-                          style: TextStyle(
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.infoCircle,
+                            size: 16,
                             color: Colors.white70,
-                            fontWeight: FontWeight.w300,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 8),
+                          Text(
+                            'Version: 1.0',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
